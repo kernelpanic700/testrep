@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+iptables -t mangle -A POSTROUTING -p udp --sport 64910 -j MARK --set-mark 10
+tc qdisc add dev ens3 root handle 1: htb default 10
+tc class add dev ens3 parent 1: classid 1:10 htb rate 10mbit
+tc filter add dev ens3 protocol ip parent 1: prio 1 handle 10 fw flowid 1:10
+iptables -I INPUT -p icmp -i ens3 -j DROP
